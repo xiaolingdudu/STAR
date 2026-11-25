@@ -1,5 +1,6 @@
 # STAR: Counterfactual Dual-World Rollouts and Spatial Target Adaptive Reconstruction for Visual On-Policy Distillation
 
+[![arXiv:2611.32472](https://img.shields.io/badge/arXiv-2611.32472-b31b1b)](https://arxiv.org/html/2611.32472)
 [![Hugging Face 模型合集](https://img.shields.io/badge/Hugging%20Face-Models-FFD21E)](https://huggingface.co/collections/Yizou/star)
 [![STAR-6K 数据集](https://img.shields.io/badge/Dataset-STAR--6K-3B82A0)](https://huggingface.co/datasets/Yizou/STAR-6K)
 [![代码许可证](https://img.shields.io/badge/Code%20license-Apache%202.0-blue)](LICENSE)
@@ -225,10 +226,14 @@ python scripts/evaluate.py --data /tmp/benchmarks --output /tmp/star-eval/4b \
 ## 🎓 引用
 
 ```bibtex
-@misc{zou2026star,
-  title  = {{STAR}: Counterfactual Dual-World Rollouts and Spatial Target Adaptive Reconstruction for Visual On-Policy Distillation},
-  author = {Yi Zou and Zhuang Yan and Yudong Zhang and Xu Wang and Yang Wang},
-  year   = {2026}
+@misc{zou2026starcounterfactualdualworldrollouts,
+  title         = {STAR: Counterfactual Dual-World Rollouts and Spatial Target Adaptive Reconstruction for Visual On-Policy Distillation},
+  author        = {Yi Zou and Zhuang Yan and Yudong Zhang and Xu Wang and Yang Wang},
+  year          = {2026},
+  eprint        = {2611.32472},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  url           = {https://arxiv.org/abs/2611.32472}
 }
 ```
 
