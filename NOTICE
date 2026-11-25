@@ -1,0 +1,19 @@
+STAR
+
+This source snapshot contains project modifications to training code derived
+from Vision-OPD (https://github.com/VisionOPD/Vision-OPD) and verl
+(https://github.com/volcengine/verl). Their copyright and license headers are
+retained. The bundled verl fork identifies itself as version 0.7.0.dev0.
+
+The benchmark preparation and scoring implementation under
+evaluation/vision_opd_official derives from the Vision-OPD evaluation pipeline.
+Project changes include deterministic decoding, answer reuse, complete-result
+checks, and handling of unresolved samples.
+
+The standalone distribution removes internal scheduler and model-storage
+integration. It adds local training recipes and the STAR-6K release importer.
+The STAR loss, Teacher attention centers, support union, and world sampler
+retain their experiment implementation.
+
+Code: Apache License 2.0. Model weights and datasets have their own terms;
+the code license does not relicense third-party images or model weights.

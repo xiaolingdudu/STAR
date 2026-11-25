@@ -1,0 +1,12 @@
+defaults:
+  - star
+  - _self_
+
+# Use the shared learning-rate schedule; only the 27B memory settings differ.
+actor_rollout_ref:
+  actor:
+    defer_gradient_sync: false
+    ppo_max_token_len_per_gpu: 9216
+  rollout:
+    gpu_memory_utilization: 0.50
+    max_num_batched_tokens: 16384

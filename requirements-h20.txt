@@ -1,0 +1,7 @@
+# NVIDIA H20 profile. Install GPU-specific packages first (see README).
+-r requirements-common.txt
+transformers==5.5.3
+huggingface-hub==1.9.0
+accelerate==1.12.0
+datasets==4.4.2
+peft==0.18.0

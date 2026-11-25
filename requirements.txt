@@ -1,0 +1,3 @@
+# AMD MI308 profile. Install GPU-specific packages first (see README).
+-r requirements-common.txt
+transformers==5.2.0

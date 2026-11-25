@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "star-visual-opd"
+version = "0.1.0"
+description = "STAR: dual-world on-policy visual distillation with attention-guided target reconstruction"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["verl*", "evaluation*"]
+
+[tool.setuptools.package-data]
+verl = ["version/*", "trainer/config/*.yaml", "trainer/config/*/*.yaml", "py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,170 @@
+defaults:
+  - vopd
+  - _self_
+
+data:
+  seed: 42
+  train_files: ["${oc.env:STAR_TRAIN_FILE}"]
+  val_files: []
+  train_batch_size: 96
+  dataloader_num_workers: 0
+  filter_overlong_prompts: false
+  max_prompt_length: 8192
+  max_response_length: 1024
+  truncation: error
+  shuffle: true
+  return_multi_modal_inputs: true
+  image_key: images
+
+actor_rollout_ref:
+  model:
+    path: ${oc.env:STAR_MODEL}
+    custom_chat_template_file: ${oc.env:STAR_ROOT}/chat_templates/perception_chat_template_qwen35.jinja
+    use_remove_padding: false
+    enable_gradient_checkpointing: true
+    enable_activation_offload: false
+    use_fused_kernels: false
+  actor:
+    strategy: fsdp
+    ppo_mini_batch_size: 96
+    ppo_micro_batch_size_per_gpu: 1
+    ppo_epochs: 1
+    use_dynamic_bsz: true
+    ppo_max_token_len_per_gpu: 16384
+    loss_agg_mode: token-mean
+    trim_padding: true
+    response_only_logits: true
+    prune_update_payload: true
+    share_multimodal_inputs: true
+    defer_gradient_sync: true
+    use_torch_compile: false
+    calculate_entropy: false
+    use_kl_loss: false
+    data_loader_seed: 42
+    ulysses_sequence_parallel_size: 1
+    fsdp_config:
+      fsdp_size: -1
+      param_offload: false
+      optimizer_offload: false
+      seed: 42
+      wrap_policy:
+        transformer_layer_cls_to_wrap: [Qwen3_5DecoderLayer, Qwen3_5VisionBlock]
+    optim:
+      lr: 2.0e-6
+      lr_warmup_steps: 10
+      total_training_steps: 130
+      lr_scheduler_type: constant
+      min_lr_ratio: 0.05
+      lr_drop_after_step: null
+      lr_drop_ratio: 1.0
+      lr_drop_decay_end_step: null
+      betas: [0.9, 0.999]
+      weight_decay: 0.01
+      clip_grad: 1.0
+    policy_loss:
+      loss_mode: vopd
+    self_distillation:
+      target_mode: full_teacher
+      teacher_model_source: legacy
+      teacher_model_path: ${oc.env:STAR_MODEL}
+      teacher_always_on: true
+      teacher_regularization: ema
+      teacher_update_rate: 0.0
+      teacher_prompt_mode: null
+      teacher_image_key: bbox_images
+      counterfactual_teacher_image_key: null
+      max_reprompt_len: 10240
+      full_logit_distillation: true
+      distillation_topk: 100
+      distillation_add_tail: true
+      alpha: 0.5
+      is_clip: 2.0
+      attention_target_enabled: true
+      attention_target_map: teacher_center
+      attention_target_gate_mode: adaptive
+      attention_target_beta: 1.0
+      attention_target_teacher_topk: 20
+      attention_target_negative_mode: mean_erased
+      attention_external_weight_enabled: false
+      evidence_attention_layer: 20
+      evidence_attention_max_tokens: 0
+      evidence_attention_alpha: 0.1
+      evidence_attention_lambda: 0.0
+      caption_kl_lambda: 0.0
+      opd_loss_lambda: 1.0
+      attention_focus_enabled: false
+      evidence_gap_enabled: false
+      pair_aux_weight: 0
+  ref:
+    log_prob_micro_batch_size_per_gpu: 1
+    fsdp_config:
+      param_offload: false
+      seed: 42
+      wrap_policy:
+        transformer_layer_cls_to_wrap: [Qwen3_5DecoderLayer, Qwen3_5VisionBlock]
+  rollout:
+    name: vllm
+    mode: async
+    n: 16
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    dtype: bfloat16
+    tensor_model_parallel_size: 1
+    pipeline_model_parallel_size: 1
+    gpu_memory_utilization: 0.45
+    max_model_len: 9216
+    max_num_batched_tokens: 32768
+    response_length: 1024
+    calculate_log_probs: false
+    log_prob_micro_batch_size_per_gpu: 1
+    free_cache_engine: true
+    agent:
+      num_workers: 64
+      default_agent_loop: single_turn_agent
+
+algorithm:
+  counterfactual_world:
+    enabled: true
+    mode: uniform
+    gap: 0.2
+  noisy_rollout:
+    enabled: true
+    noisy_count: 0
+    all_noisy_from_epoch: null
+    skip_old_log_prob: true
+  rollout_correction:
+    rollout_is: null
+  use_kl_in_reward: false
+
+reward_model:
+  enable: false
+  use_reward_loop: false
+  reward_manager: batch
+reward_manager:
+  name: batch
+custom_reward_function:
+  path: ${oc.env:STAR_ROOT}/verl/utils/reward_score/opd_benchmark_mcq.py
+  name: compute_score_batched
+
+trainer:
+  project_name: STAR
+  group_name: STAR
+  experiment_name: ${oc.env:STAR_RUN,star}
+  logger: [console]
+  n_gpus_per_node: 8
+  nnodes: 8
+  save_freq: 10
+  test_freq: -1
+  val_before_train: false
+  total_epochs: 3
+  total_training_steps: 130
+  max_actor_ckpt_to_keep: null
+  default_local_dir: ${oc.env:STAR_OUTPUT}
+  rollout_data_dir: ${oc.env:STAR_OUTPUT}/rollouts
+  resume_mode: disable
+  resume_from_path: null
+
+hydra:
+  job:
+    chdir: false

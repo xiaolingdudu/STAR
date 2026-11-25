@@ -1,0 +1,7 @@
+openai>=2,<3
+httpx>=0.28
+pillow>=11
+tqdm>=4.67
+mathruler==0.1.0
+pyarrow>=21
+huggingface_hub>=1,<2
